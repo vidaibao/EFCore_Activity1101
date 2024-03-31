@@ -9,6 +9,10 @@ namespace InventoryBusinessLayer
 {
     public interface IItemsService
     {
+        int UpsertItem(CreateOrUpdateItemDto item);
+        void UpsertItems(List<CreateOrUpdateItemDto> items);
+        void DeleteItem(int id);
+        void DeleteItems(List<int> itemIds);
         List<ItemDto> GetItems();
         List<ItemDto> GetItemsByDateRange(DateTime minDateValue, DateTime maxDateValue);
         List<GetItemsForListingDto> GetItemsForListingFromProcedure();

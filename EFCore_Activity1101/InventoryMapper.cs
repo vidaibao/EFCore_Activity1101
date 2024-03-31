@@ -13,7 +13,8 @@ namespace EFCore_Activity1101
 
         private void CreateMaps()
         {
-            CreateMap<Item, ItemDto>();
+            CreateMap<Item, ItemDto>().ReverseMap();    // ReverseMap: make the map go in both directions
+
             CreateMap<Category, CategoryDto>()
                 .ForMember(x => x.Category, opt => opt.MapFrom(y => y.Name))
                 .ReverseMap()
@@ -24,6 +25,10 @@ namespace EFCore_Activity1101
                 .ReverseMap()
                 .ForMember(y => y.ColorValue, opt => opt.MapFrom(x => x.Value))
                 .ForMember(y => y.ColorName, opt => opt.MapFrom(x => x.Color));
+
+            CreateMap<Item, CreateOrUpdateItemDto>()
+                .ReverseMap()
+                .ForMember(x => x.Category, opt => opt.Ignore());
         }
     }
 
