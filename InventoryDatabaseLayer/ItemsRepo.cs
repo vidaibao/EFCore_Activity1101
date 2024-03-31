@@ -2,6 +2,8 @@
 using AutoMapper.QueryableExtensions;
 using EFCore_DBLibrary;
 using InventoryModels.DTOs;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryDatabaseLayer
 {
@@ -25,22 +27,33 @@ namespace InventoryDatabaseLayer
 
         public List<ItemDto> GetItemsByDateRange(DateTime minDateValue, DateTime maxDateValue)
         {
-            throw new NotImplementedException();
+            return _context.Items.Include(x => x.Category)
+                        .Where(x => x.CreatedDate >= minDateValue && x.CreatedDate <= maxDateValue)
+                        .ProjectTo<ItemDto>(_mapper.ConfigurationProvider)
+                        .ToList();
         }
 
         public List<GetItemsForListingDto> GetItemsForListingFromProcedure()
         {
-            throw new NotImplementedException();
+            return _context.ItemsForListing.FromSqlRaw("EXECUTE dbo.GetItemsForListing").ToList();
         }
 
         public List<GetItemsTotalValueDto> GetItemsTotalValues(bool isActive)
         {
-            throw new NotImplementedException();
+            var isActiveParm = new SqlParameter("IsActive", 1);
+            return _context.GetItemsTotalValues
+                        .FromSqlRaw("SELECT * from [dbo].[GetItemsTotalValue] (@IsActive)", isActiveParm)
+                        .ToList();
         }
 
         public List<FullItemDetailDto> GetItemsWithGenresAndCategories()
         {
-            throw new NotImplementedException();
+            return _context.FullItemDetailDtos
+                        .FromSqlRaw("SELECT * FROM [dbo].[vwFullItemDetails]")
+                        .AsEnumerable()
+                        .OrderBy(x => x.ItemName).ThenBy(x => x.GenreName)
+                        .ThenBy(x => x.Category).ThenBy(x => x.PlayerName)
+                        .ToList();
         }
     }
 }
