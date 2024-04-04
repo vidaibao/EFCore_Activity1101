@@ -1,8 +1,13 @@
 ﻿using AutoMapper;
-using InventoryModels;
 using InventoryModels.DTOs;
+using InventoryModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace InventoryManagerUnitTests
+namespace InventoryManagerIntegrationTests
 {
     public class InventoryMapper : Profile
     {
@@ -31,5 +36,4 @@ namespace InventoryManagerUnitTests
                 .ForMember(x => x.Category, opt => opt.Ignore());
         }
     }
-
 }

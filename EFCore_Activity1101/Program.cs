@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace EFCore_Activity1101
+namespace InventoryManagerUnitTests
 {
     public class Program
     {

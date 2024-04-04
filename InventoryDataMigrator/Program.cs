@@ -6,6 +6,12 @@ using System;
 
 namespace InventoryDataMigrator
 {
+
+    /*
+    Don’t run update-database. Instead, run the migrator project you created to both execute the migration and also seed the Categories and CategoryDetails.
+    Right-click the InventoryDataMigrator project and select Debug ➤ Start New Instance
+     */
+
     class Program
     {
         static IConfigurationRoot _configuration;
@@ -27,22 +33,18 @@ namespace InventoryDataMigrator
 
         private static void ApplyMigrations()
         {
-            using (var db = new InventoryDbContext(_optionsBuilder.Options))
-            {
-                db.Database.Migrate();
-            }
+            using var db = new InventoryDbContext(_optionsBuilder.Options);
+            db.Database.Migrate();
         }
 
         private static void ExecuteCustomSeedData()
         {
-            using (var context = new InventoryDbContext(_optionsBuilder.Options))
-            {
-                var items = new BuildItems(context);
-                items.ExecuteSeed();
+            using var context = new InventoryDbContext(_optionsBuilder.Options);
+            var items = new BuildItems(context);
+            items.ExecuteSeed();
 
-                var categories = new BuildCategories(context);
-                categories.ExecuteSeed();
-            }
+            var categories = new BuildCategories(context);
+            categories.ExecuteSeed();
         }
 
 

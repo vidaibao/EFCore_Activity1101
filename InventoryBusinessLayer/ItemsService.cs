@@ -5,6 +5,7 @@ using InventoryModels;
 using InventoryModels.DTOs;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace InventoryBusinessLayer
 {
@@ -13,13 +14,20 @@ namespace InventoryBusinessLayer
         private readonly IItemsRepo _dbRepo;
         private readonly IMapper _mapper;
 
+        // the business/service layer is too tightly coupled to the database >>>
         public ItemsService(InventoryDbContext dbContext, IMapper mapper)
         {
             _dbRepo = new ItemsRepo(dbContext, mapper);
             _mapper = mapper;
         }
+        // >>>
+        public ItemsService(IItemsRepo dbRepo, IMapper mapper)
+        {
+            _dbRepo = dbRepo;
+            _mapper = mapper;
+        }
 
-        
+
         public string GetAllItemsPipeDelimitedString()
         {
             return string.Join("|", GetItems());
