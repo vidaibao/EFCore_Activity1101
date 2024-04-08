@@ -9,6 +9,6 @@ namespace InventoryBusinessLayer
 {
     public interface ICategoriesService
     {
-        List<CategoryDto> ListCategoriesAndDetails();
+        Task<List<CategoryDto>> ListCategoriesAndDetails();
     }
 }

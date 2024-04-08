@@ -54,7 +54,8 @@ namespace InventoryManagerUnitTests
 
             var items = GetItemsTestData();
 
-            _itemsRepo.Setup(m => m.GetItems()).Returns(items);
+            //_itemsRepo.Setup(m => m.GetItems()).Returns(items);
+            _itemsRepo.Setup(m => m.GetItems()).Returns(Task.FromResult(items));
         }
 
         private List<Item> GetItemsTestData()
@@ -68,9 +69,9 @@ namespace InventoryManagerUnitTests
         }
 
         [TestMethod]
-        public void TestGetItems()
+        public async Task TestGetItems()
         {
-            var result = _itemsService.GetItems();
+            var result = await _itemsService.GetItems();
             //Assert.IsNotNull(result);
             //Assert.IsTrue(result.Any()); //Assert.IsTrue(result.Count > 0);
             result.ShouldNotBeNull();

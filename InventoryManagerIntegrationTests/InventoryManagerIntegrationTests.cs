@@ -45,6 +45,8 @@ namespace InventoryManagerIntegrationTests
         public InventoryManagerIntegrationTests()
         {
             SetupOptions();
+            
+            BuildDefaults();
         }
 
         private void SetupOptions()
@@ -65,16 +67,16 @@ namespace InventoryManagerIntegrationTests
         }
 
         [Fact]
-        public void TestGetItems()
+        public async Task TestGetItems()
         {
             //arrange
-            BuildDefaults();
+            //BuildDefaults();
 
             using var context = new InventoryDbContext(_options);
             
             //act
             _dbRepo = new ItemsRepo(context, _mapper);
-            var items = _dbRepo.GetItems();
+            var items = await _dbRepo.GetItems();
 
             //assert
             items.ShouldNotBeNull();
@@ -172,6 +174,27 @@ namespace InventoryManagerIntegrationTests
             };
             context.Items.Add(item3);
             context.SaveChanges();
+        }
+
+
+        [Theory]
+        [InlineData(CAT1_NAME, COLOR_BLUE, COLOR_BLUE_VALUE)]
+        [InlineData(CAT2_NAME, COLOR_RED, COLOR_RED_VALUE)]
+        [InlineData(CAT3_NAME, COLOR_GREEN, COLOR_GREEN_VALUE)]
+        public async Task TestCategoryColors(string name, string color, string colorValue)
+        {
+            //arrange
+            //BuildDefaults();
+            using var context = new InventoryDbContext(_options);
+            //act
+            var categoriesRepo = new CategoriesRepo(context, _mapper);
+            var categories = await categoriesRepo.ListCategoriesAndDetails();
+            categories.ShouldNotBeNull();
+            categories.Count.ShouldBe(3);
+            var category = categories.FirstOrDefault(x => x.Category.Equals(name));
+            category.ShouldNotBeNull();
+            category.CategoryDetail.Color.ShouldBe(color);
+            category.CategoryDetail.Value.ShouldBe(colorValue);
         }
     }
 }

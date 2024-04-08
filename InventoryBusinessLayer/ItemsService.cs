@@ -28,50 +28,50 @@ namespace InventoryBusinessLayer
         }
 
 
-        public string GetAllItemsPipeDelimitedString()
+        public async Task<string> GetAllItemsPipeDelimitedString()
         {
-            return string.Join("|", GetItems());
+            return string.Join("|", await GetItems());
         }
 
-        public List<ItemDto> GetItems()
+        public async Task<List<ItemDto>> GetItems()
         {
-            return _mapper.Map<List<ItemDto>>(_dbRepo.GetItems());
+            return _mapper.Map<List<ItemDto>>(await _dbRepo.GetItems());
         }
 
-        public List<ItemDto> GetItemsByDateRange(DateTime minDateValue, DateTime maxDateValue)
+        public async Task<List<ItemDto>> GetItemsByDateRange(DateTime minDateValue, DateTime maxDateValue)
         {
-            return _dbRepo.GetItemsByDateRange(minDateValue, maxDateValue);
+            return await _dbRepo.GetItemsByDateRange(minDateValue, maxDateValue);
         }
 
-        public List<GetItemsForListingDto> GetItemsForListingFromProcedure()
+        public async Task<List<GetItemsForListingDto>> GetItemsForListingFromProcedure()
         {
-            return _dbRepo.GetItemsForListingFromProcedure();
+            return await _dbRepo.GetItemsForListingFromProcedure();
         }
 
-        public List<GetItemsTotalValueDto> GetItemsTotalValues(bool isActive)
+        public async Task<List<GetItemsTotalValueDto>> GetItemsTotalValues(bool isActive)
         {
-            return _dbRepo.GetItemsTotalValues(isActive);
+            return await _dbRepo.GetItemsTotalValues(isActive);
         }
 
-        public List<FullItemDetailDto> GetItemsWithGenresAndCategories()
+        public async Task<List<FullItemDetailDto>> GetItemsWithGenresAndCategories()
         {
-            return _dbRepo.GetItemsWithGenresAndCategories();
+            return await _dbRepo.GetItemsWithGenresAndCategories();
         }
 
-        public int UpsertItem(CreateOrUpdateItemDto item)
+        public async Task<int> UpsertItem(CreateOrUpdateItemDto item)
         {
             if (item.CategoryId <= 0)
             {
                 throw new ArgumentException("Please set the category id before insert or update");
             }
-            return _dbRepo.UpsertItem(_mapper.Map<Item>(item));
+            return await _dbRepo.UpsertItem(_mapper.Map<Item>(item));
         }
 
-        public void UpsertItems(List<CreateOrUpdateItemDto> items)
+        public async Task UpsertItems(List<CreateOrUpdateItemDto> items)
         {
             try
             {
-                _dbRepo.UpsertItems(_mapper.Map<List<Item>>(items));
+                await _dbRepo.UpsertItems(_mapper.Map<List<Item>>(items));
             }
             catch (Exception ex)
             {
@@ -79,20 +79,20 @@ namespace InventoryBusinessLayer
                 Console.WriteLine($"The transaction has failed: {ex.Message}");
             }
         }
-        public void DeleteItem(int id)
+        public async Task DeleteItem(int id)
         {
             if (id <= 0)
             {
                 throw new ArgumentException("Please set a valid item id before deleting");
             }
-            _dbRepo.DeleteItem(id);
+            await _dbRepo.DeleteItem(id);
         }
 
-        public void DeleteItems(List<int> itemIds)
+        public async Task DeleteItems(List<int> itemIds)
         {
             try
             {
-                _dbRepo.DeleteItems(itemIds);
+                await _dbRepo.DeleteItems(itemIds);
             }
             catch (Exception ex)
             {

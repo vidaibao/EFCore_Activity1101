@@ -9,6 +9,7 @@ namespace InventoryDatabaseLayer
 {
     public interface ICategoriesRepo
     {
-        List<CategoryDto> ListCategoriesAndDetails();
+        Task<List<CategoryDto>> ListCategoriesAndDetails();
+        //List<CategoryDto> ListCategoriesAndDetails();
     }
 }

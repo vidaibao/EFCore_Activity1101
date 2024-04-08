@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace InventoryManagerUnitTests
@@ -28,7 +29,7 @@ namespace InventoryManagerUnitTests
         private static ICategoriesService _categoriesService;
 
         
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             BuildOptions();
             BuildMapper();
@@ -37,13 +38,13 @@ namespace InventoryManagerUnitTests
             _itemsService = new ItemsService(db, _mapper);
             _categoriesService = new CategoriesService(db, _mapper);
 
-            ListInventory();
-            GetItemsForListing();
-            GetItemsForListingLinq();
-            GetAllActiveItemsAsPipeDelimitedString();
-            GetItemsTotalValues();
-            GetFullItemDetails();
-            ListCategoriesAndColors();
+            await ListInventory();
+            await GetItemsForListing();
+            await GetItemsForListingLinq();
+            await GetAllActiveItemsAsPipeDelimitedString();
+            await GetItemsTotalValues();
+            await GetFullItemDetails();
+            await ListCategoriesAndColors();
 
 
             Console.WriteLine("Would you like to create items?");
@@ -54,7 +55,7 @@ namespace InventoryManagerUnitTests
                 CreateMultipleItems();
                 Console.WriteLine("Items added");
 
-                var inventory = _itemsService.GetItems();
+                var inventory = await _itemsService.GetItems();
                 inventory.ForEach(x => Console.WriteLine($"Item: {x}"));
             }
 
@@ -64,9 +65,9 @@ namespace InventoryManagerUnitTests
             if (updateItems)
             {
                 Console.WriteLine("Updating Item(s)");
-                UpdateMultipleItems();
+                await UpdateMultipleItems();
                 Console.WriteLine("Items updated");
-                var inventory2 = _itemsService.GetItems();
+                var inventory2 = await _itemsService.GetItems();
                 inventory2.ForEach(x => Console.WriteLine($"Item: {x}"));
             }
 
@@ -75,9 +76,9 @@ namespace InventoryManagerUnitTests
             if (deleteItems)
             {
                 Console.WriteLine("Deleting Item(s)");
-                DeleteMultipleItems();
+                await DeleteMultipleItems();
                 Console.WriteLine("Items deleted");
-                var inventory2 = _itemsService.GetItems();
+                var inventory2 = await _itemsService.GetItems();
                 inventory2.ForEach(x => Console.WriteLine($"Item: {x}"));
             }
 
@@ -105,17 +106,17 @@ namespace InventoryManagerUnitTests
             _mapper = _mapperConfig.CreateMapper();
         }
 
-        private static void ListInventory()
+        private static async Task ListInventory()
         {
             Console.WriteLine("ListInventory");
-            var result = _itemsService.GetItems();
+            var result = await _itemsService.GetItems();
             result.ForEach(x => Console.WriteLine($"New Item: {x}"));
         }
 
-        private static void GetItemsForListing()
+        private static async Task GetItemsForListing()
         {
             Console.WriteLine("GetItemsForListing");
-            var results = _itemsService.GetItemsForListingFromProcedure();
+            var results = await _itemsService.GetItemsForListingFromProcedure();
             foreach (var item in results)
             {
                 var output = $"ITEM {item.Name}] {item.Description}";
@@ -127,13 +128,13 @@ namespace InventoryManagerUnitTests
             }
         }
 
-        private static void GetItemsForListingLinq()
+        private static async Task GetItemsForListingLinq()
         {
             Console.WriteLine("GetItemsForListingLinq");
             var minDateValue = new DateTime(2021, 1, 1);
             var maxDateValue = new DateTime(2025, 1, 1);
 
-            var results = _itemsService.GetItemsByDateRange(minDateValue, maxDateValue);
+            var results = await _itemsService.GetItemsByDateRange(minDateValue, maxDateValue);
 
             foreach (var itemDto in results)
             {
@@ -141,16 +142,16 @@ namespace InventoryManagerUnitTests
             }
         }
 
-        private static void GetAllActiveItemsAsPipeDelimitedString()
+        private static async Task GetAllActiveItemsAsPipeDelimitedString()
         {
             Console.WriteLine("GetAllActiveItemsAsPipeDelimitedString");
-            Console.WriteLine($"All active Items: {_itemsService.GetAllItemsPipeDelimitedString()}");
+            Console.WriteLine($"All active Items: {await _itemsService.GetAllItemsPipeDelimitedString()}");
         }
 
-        private static void GetItemsTotalValues()
+        private static async Task GetItemsTotalValues()
         {
             Console.WriteLine("GetItemsTotalValues");
-            var result = _itemsService.GetItemsTotalValues(true);
+            var result = await _itemsService.GetItemsTotalValues(true);
 
             foreach (var item in result)
             {
@@ -161,10 +162,10 @@ namespace InventoryManagerUnitTests
             }
         }
 
-        private static void GetFullItemDetails()
+        private static async Task GetFullItemDetails()
         {
             Console.WriteLine("GetFullItemDetails View");
-            var result = _itemsService.GetItemsWithGenresAndCategories();
+            var result = await _itemsService.GetItemsWithGenresAndCategories();
 
             foreach (var item in result)
             {
@@ -177,10 +178,10 @@ namespace InventoryManagerUnitTests
             }
         }
 
-        private static void ListCategoriesAndColors()
+        private static async Task ListCategoriesAndColors()
         {
             Console.WriteLine("ListCategoriesAndColors");
-            var results = _categoriesService.ListCategoriesAndDetails();
+            var results = await _categoriesService.ListCategoriesAndDetails();
             _categories = results;
 
             foreach (var c in results)
@@ -258,11 +259,10 @@ namespace InventoryManagerUnitTests
         // Update
 
 
-        private static void UpdateMultipleItems()
+        private static async Task UpdateMultipleItems()
         {
             Console.WriteLine("Would you like to update items as a batch?");
-            bool batchUpdate = Console.ReadLine().StartsWith("y", StringComparison.
-            OrdinalIgnoreCase);
+            bool batchUpdate = Console.ReadLine().StartsWith("y", StringComparison.OrdinalIgnoreCase);
             var allItems = new List<CreateOrUpdateItemDto>();
             bool updateAnother = true;
             while (updateAnother == true)
@@ -270,7 +270,7 @@ namespace InventoryManagerUnitTests
                 Console.WriteLine("Items");
                 Console.WriteLine("Enter the ID number to update");
                 Console.WriteLine("*******************************");
-                var items = _itemsService.GetItems();
+                var items = await _itemsService.GetItems();
                 items.ForEach(x => Console.WriteLine($"ID: {x.Id} | {x.Name}"));
                 Console.WriteLine("*******************************");
                 int id = 0;
@@ -300,7 +300,7 @@ namespace InventoryManagerUnitTests
                         updItem.CategoryId = userChoice.Equals("N", StringComparison.OrdinalIgnoreCase) ? itemMatch.CategoryId : GetCategoryId(userChoice);
                         if (!batchUpdate)
                         {
-                            _itemsService.UpsertItem(updItem);
+                            await _itemsService.UpsertItem(updItem);
                         }
                         else
                         {
@@ -312,13 +312,13 @@ namespace InventoryManagerUnitTests
                 updateAnother = Console.ReadLine().StartsWith("y", StringComparison.OrdinalIgnoreCase);
                 if (batchUpdate && !updateAnother)
                 {
-                    _itemsService.UpsertItems(allItems);
+                    await _itemsService.UpsertItems(allItems);
                 }
             }
         }
 
 
-        private static void DeleteMultipleItems()
+        private static async Task DeleteMultipleItems()
         {
             Console.WriteLine("Would you like to delete items as a batch?");
             bool batchDelete = Console.ReadLine().StartsWith("y", StringComparison.OrdinalIgnoreCase);
@@ -329,7 +329,7 @@ namespace InventoryManagerUnitTests
                 Console.WriteLine("Items");
                 Console.WriteLine("Enter the ID number to delete");
                 Console.WriteLine("*******************************");
-                var items = _itemsService.GetItems();
+                var items = await _itemsService.GetItems();
                 items.ForEach(x => Console.WriteLine($"ID: {x.Id} | {x.Name}"));
                 Console.WriteLine("*******************************");
                 if (batchDelete && allItems.Any())
@@ -354,7 +354,7 @@ namespace InventoryManagerUnitTests
                             Console.WriteLine($"Are you sure you want to delete the item { itemMatch.Id}-{ itemMatch.Name}");
                             if (Console.ReadLine().StartsWith("y", StringComparison.OrdinalIgnoreCase))
                             {
-                                _itemsService.DeleteItem(itemMatch.Id);
+                                await _itemsService.DeleteItem(itemMatch.Id);
                                 Console.WriteLine("Item Deleted");
                             }
                         }
@@ -369,7 +369,7 @@ namespace InventoryManagerUnitTests
                     Console.WriteLine();
                     if (Console.ReadLine().StartsWith("y", StringComparison.OrdinalIgnoreCase))
                     {
-                        _itemsService.DeleteItems(allItems);
+                        await _itemsService.DeleteItems(allItems);
                         Console.WriteLine("Items Deleted");
                     }
                         

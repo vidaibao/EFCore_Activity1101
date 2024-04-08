@@ -21,11 +21,11 @@ namespace InventoryDatabaseLayer
             _mapper = mapper;
         }
 
-        public List<CategoryDto> ListCategoriesAndDetails()
+        public async Task<List<CategoryDto>> ListCategoriesAndDetails()
         {
-            return _context.Categories.Include(x => x.CategoryDetail)
+            return await _context.Categories.Include(x => x.CategoryDetail)
                         .ProjectTo<CategoryDto>(_mapper.ConfigurationProvider)
-                        .ToList();
+                        .ToListAsync();
         }
     }
 }
